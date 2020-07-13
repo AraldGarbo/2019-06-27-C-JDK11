@@ -5,8 +5,11 @@
 package it.polito.tdp.crimes;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.crimes.model.Giornata;
+import it.polito.tdp.crimes.model.Legame;
 import it.polito.tdp.crimes.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,10 +28,10 @@ public class CrimesController {
     private URL location;
 
     @FXML // fx:id="boxCategoria"
-    private ComboBox<?> boxCategoria; // Value injected by FXMLLoader
+    private ComboBox<String> boxCategoria; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxGiorno"
-    private ComboBox<?> boxGiorno; // Value injected by FXMLLoader
+    private ComboBox<Giornata> boxGiorno; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnAnalisi"
     private Button btnAnalisi; // Value injected by FXMLLoader
@@ -46,6 +49,23 @@ public class CrimesController {
     void doCreaGrafo(ActionEvent event) {
     	txtResult.clear();
     	txtResult.appendText("Crea grafo...\n");
+    	//controllo menù a tendina (Oggetto è il tipo di oggetto contenuto nella tendina)
+    	String reato = this.boxCategoria.getValue(); 
+     	if(reato == null) {
+     		txtResult.appendText("SELEZIONA UN REATO!");
+    	  	return;
+    	}
+    	//controllo menù a tendina (Oggetto è il tipo di oggetto contenuto nella tendina)
+		Giornata giorno = this.boxGiorno.getValue(); 
+		if(giorno == null) {
+			txtResult.appendText("SELEZIONA UNA DATA!");
+    	  	return;
+      	}
+		this.model.creaGrafo(reato, giorno);
+		List<Legame> legami = this.model.getLegami();
+		for(Legame l : legami) {
+			txtResult.appendText(String.format("\n%s - %s - %.00f", l.getTipo1(), l.getTipo2(), l.getPeso()));
+		}
     }
 
     @FXML
@@ -67,5 +87,7 @@ public class CrimesController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	this.boxCategoria.getItems().addAll(this.model.getReati());
+    	this.boxGiorno.getItems().addAll(this.model.getDate());
     }
 }
